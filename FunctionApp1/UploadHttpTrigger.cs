@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 
 namespace FunctionApp1
@@ -17,7 +17,8 @@ namespace FunctionApp1
         [FunctionName("UploadHttpTrigger")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = "files")] HttpRequestMessage req,
-            ILogger log)
+            ILogger log,
+            [Blob("%AzureStorage:FilePath%", FileAccess.Write, Connection = "AzureStorage:ConnectionString")] CloudBlobContainer cloudBlobContainer)
         {
             log.LogInformation(
                 $"{nameof(UploadHttpTrigger)} trigger function processed a request.");
@@ -34,16 +35,6 @@ namespace FunctionApp1
 
             log.LogInformation(
                 JsonConvert.SerializeObject(fileInfo, Formatting.Indented));
-
-            var cloudStorageAccount =
-                CloudStorageAccount.Parse(Environment.GetEnvironmentVariable("AzureStorage:ConnectionString"));
-
-            var cloudBlobClient =
-                cloudStorageAccount.CreateCloudBlobClient();
-
-            var cloudBlobContainer =
-                cloudBlobClient.GetContainerReference(
-                    Environment.GetEnvironmentVariable("AzureStorage:FilePath"));
 
             var blobName =
                 $"{Guid.NewGuid()}{Path.GetExtension(fileInfo.FileName)}";
