@@ -1,0 +1,18 @@
+﻿@page
+@model WebApplication1.UploadModel
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<h2>Upload</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+    <div class="form-group">
+        <label>Select a file to upload</label>
+        <input type="file" id="file" name="file" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload</button>
+
+</form>
